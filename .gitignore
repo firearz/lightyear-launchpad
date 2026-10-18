@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------
+# Lightyear — .gitignore
+# ---------------------------------------------------------------
+
+# Legacy Rust/Tauri prototype (kept locally, not part of this repo)
+old_launcher/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# PyInstaller / build output
+build/
+dist/
+release/
+*.manifest
+!lightyear.spec
+
+# Runtime logs & crash dumps
+logs/
+*.log
+*.log.gz
+launcher_crash.log
+
+# Local launcher data (should live in %APPDATA%, never in the repo)
+instances/
+versions/
+libraries/
+runtime/
+runtimes/
+lightyear_settings.json
+installations.json
+
+# Editors & OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3
+
+  smoke:
+    name: Import smoke test (Python ${{ matrix.python }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Compile all sources
+        run: python -m compileall -q main.py lightyear
+      - name: Import modules & verify offline UUID
+        run: |
+          python -c "import lightyear.core as c, lightyear.ui_components, lightyear.main_window; assert c.offline_uuid_v3('Notch') == 'b50ad385-829d-3141-a216-7e7d7539ba7f'; print('ok', c.offline_uuid_v3('Notch'))"
+
+  build:
+    name: Build Windows executable
+    runs-on: windows-latest
+    needs: [lint, smoke]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: pyinstaller lightyear.spec --noconfirm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lightyear-${{ github.sha }}-windows-x64
+          path: dist/Lightyear.exe
+          retention-days: 14

@@ -13,8 +13,6 @@ from pathlib import Path
 from PySide6.QtCore import QEvent, QThread, QTimer, Qt, Signal
 from PySide6.QtGui import (
     QColor,
-    QIcon,
-    QLinearGradient,
     QPainter,
 )
 from PySide6.QtWidgets import (
@@ -52,7 +50,6 @@ from .ui_components import (
     TopNavBar,
     ensure_circular_logo_ico,
     make_circular_logo_icon,
-    make_circular_logo_pixmap,
 )
 
 

@@ -18,6 +18,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import time
 import uuid
 import zipfile
@@ -38,27 +39,29 @@ class InterruptedException(Exception):
 # Paths & Asset Resolution
 # ---------------------------------------------------------------------------
 
-PRIMARY_LOGO_PATH = Path(r"C:\Users\NILESH\Downloads\daily\logo.png")
-PRIMARY_BG_PATH = Path(r"C:\Users\NILESH\Downloads\daily\backgroudn1.jpg")
-FALLBACK_BG_PATH = Path(r"C:\Users\NILESH\Downloads\daily\background.jpg")
+def _resolve_project_root() -> Path:
+    """
+    Returns the directory containing the bundled `assets/` folder.
+    When packaged with PyInstaller, resources are extracted to `sys._MEIPASS`.
+    """
+    frozen_root = getattr(sys, "_MEIPASS", None)
+    if getattr(sys, "frozen", False) and frozen_root:
+        return Path(frozen_root)
+    return Path(__file__).resolve().parent.parent
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+PROJECT_ROOT = _resolve_project_root()
 ASSETS_DIR = PROJECT_ROOT / "assets"
 FONTS_DIR = ASSETS_DIR / "fonts"
 
+DEFAULT_USERNAME = "Player"
+
 
 def get_logo_path() -> Path:
-    if PRIMARY_LOGO_PATH.exists():
-        return PRIMARY_LOGO_PATH
-    bundled = ASSETS_DIR / "logo.png"
-    return bundled
+    return ASSETS_DIR / "logo.png"
 
 
 def get_background_path() -> Path:
-    if PRIMARY_BG_PATH.exists():
-        return PRIMARY_BG_PATH
-    if FALLBACK_BG_PATH.exists():
-        return FALLBACK_BG_PATH
     return ASSETS_DIR / "backgroudn1.jpg"
 
 
@@ -172,7 +175,7 @@ class LauncherStore:
         self.installations_path = self.root / "installations.json"
         self.versions_txt_path = self.root / "versions.txt"
 
-        self.username: str = "Nilesh"
+        self.username: str = DEFAULT_USERNAME
         self.last_played_instance_id: str = ""
         self.max_ram_gb: int = 4
         self.instances: list[InstanceConfig] = []
@@ -185,7 +188,7 @@ class LauncherStore:
         if self.settings_path.exists():
             try:
                 data = json.loads(self.settings_path.read_text(encoding="utf-8"))
-                self.username = sanitize_username(data.get("username", "Nilesh"))
+                self.username = sanitize_username(data.get("username", DEFAULT_USERNAME))
                 self.last_played_instance_id = data.get("last_played_instance_id", "")
                 self.max_ram_gb = int(data.get("max_ram_gb", 4))
             except Exception:
@@ -196,7 +199,7 @@ class LauncherStore:
             if legacy_settings.exists():
                 try:
                     data = json.loads(legacy_settings.read_text(encoding="utf-8"))
-                    self.username = sanitize_username(data.get("username", "Nilesh"))
+                    self.username = sanitize_username(data.get("username", DEFAULT_USERNAME))
                 except Exception:
                     pass
 
@@ -1240,8 +1243,8 @@ class InstallationPipelineWorker(QThread):
             # =================================================================
             self.step_changed.emit(
                 1,
-                "Step 1/5 — Validating Setup",
-                f"Checking '{self.instance_name}' ({self.mc_version} • {self.loader}), compatibility & disk space...",
+                "Step 1/5 â€” Validating Setup",
+                f"Checking '{self.instance_name}' ({self.mc_version} â€¢ {self.loader}), compatibility & disk space...",
             )
             self.progress_changed.emit(6, "Validating configuration, mod-loader support, and disk space...")
 
@@ -1265,7 +1268,7 @@ class InstallationPipelineWorker(QThread):
                     raise ValueError(f"Forge is not available for Minecraft {self.mc_version}.")
 
             decision = decide_download_strategy(self.mc_version, self.loader, root)
-            self.progress_changed.emit(15, f"Strategy: {decision.situation} → {decision.action}")
+            self.progress_changed.emit(15, f"Strategy: {decision.situation} â†’ {decision.action}")
             time.sleep(0.25)
 
             if self._is_cancelled:
@@ -1276,7 +1279,7 @@ class InstallationPipelineWorker(QThread):
             # =================================================================
             self.step_changed.emit(
                 2,
-                "Step 2/5 — Creating Isolated Installation",
+                "Step 2/5 â€” Creating Isolated Installation",
                 f"Generating unique instance ID and isolated game directory for '{self.instance_name}'...",
             )
             slug = re.sub(r"[^a-z0-9]+", "-", self.instance_name.lower()).strip("-") or "instance"
@@ -1312,7 +1315,7 @@ class InstallationPipelineWorker(QThread):
             # =================================================================
             self.step_changed.emit(
                 3,
-                f"Step 3/5 — {decision.situation}",
+                f"Step 3/5 â€” {decision.situation}",
                 decision.action,
             )
 
@@ -1441,7 +1444,7 @@ class InstallationPipelineWorker(QThread):
             # =================================================================
             self.step_changed.emit(
                 4,
-                "Step 4/5 — Verifying Installation",
+                "Step 4/5 â€” Verifying Installation",
                 "Checking required game jars, native libraries, assets, and launch command...",
             )
             self.progress_changed.emit(88, "Verifying client jar, libraries, and launch command...")
@@ -1473,7 +1476,7 @@ class InstallationPipelineWorker(QThread):
             # =================================================================
             self.step_changed.emit(
                 5,
-                "Step 5/5 — Finishing & Returning Home",
+                "Step 5/5 â€” Finishing & Returning Home",
                 f"Saving '{inst.name}', selecting it in the dropdown, and switching to Play!",
             )
             inst.ready = True

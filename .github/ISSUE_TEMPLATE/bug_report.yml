@@ -1,0 +1,89 @@
+name: 🐛 Bug report
+description: Something isn't working as expected
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Lightyear! Please search [existing issues](https://github.com/firearz/lightyear-launchpad/issues) first to avoid duplicates.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: When I click Play on a Fabric 1.21.4 instance, the launcher...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Create a new installation (Fabric, 1.21.4)
+        2. Click Play
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Lightyear version
+      placeholder: v1.0.0 (or commit hash if running from source)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-type
+    attributes:
+      label: How are you running Lightyear?
+      options:
+        - Single-file .exe
+        - Portable .zip
+        - From source (python main.py)
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Windows 11 23H2
+    validations:
+      required: true
+
+  - type: input
+    id: mc
+    attributes:
+      label: Minecraft version & mod loader
+      placeholder: 1.21.4 Fabric
+
+  - type: input
+    id: java
+    attributes:
+      label: Java version (if relevant)
+      placeholder: Temurin 21.0.4
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        Paste the relevant part of `latest.log` from the instance folder (right-click instance → open folder → `logs/`).
+      render: text
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag & drop images here if they help explain the problem.

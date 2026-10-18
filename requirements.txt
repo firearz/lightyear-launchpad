@@ -1,0 +1,4 @@
+# Runtime dependencies for Lightyear
+PySide6>=6.7
+minecraft-launcher-lib>=8.0
+Pillow>=10.0

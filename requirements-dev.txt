@@ -1,0 +1,4 @@
+# Development & packaging tools
+-r requirements.txt
+pyinstaller>=6.10
+ruff>=0.6

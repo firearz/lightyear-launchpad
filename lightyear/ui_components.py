@@ -57,6 +57,8 @@ from PySide6.QtWidgets import (
 )
 
 from .core import (
+    ASSETS_DIR,
+    PROJECT_ROOT,
     InstalledGameVersion,
     InstanceConfig,
     LauncherStore,
@@ -272,7 +274,7 @@ def ensure_circular_logo_ico() -> Path | None:
     so Windows Taskbar and Win32 `WM_SETICON` display the circular Lightyear icon cleanly.
     """
     logo_path = get_logo_path()
-    ico_target = Path(__file__).resolve().parent.parent / "assets" / "logo_circle.ico"
+    ico_target = ASSETS_DIR / "logo_circle.ico"
     try:
         from PIL import ImageDraw
 
@@ -461,8 +463,8 @@ def _resolve_icon_asset_path(icon_key: str) -> Path | None:
     if os.path.isfile(icon_key):
         return Path(icon_key)
 
-    project_root = Path(__file__).resolve().parent.parent
-    assets_icons_dir = project_root / "assets" / "icons"
+    project_root = PROJECT_ROOT
+    assets_icons_dir = ASSETS_DIR / "icons"
     user_icons_dir = project_root / "icons"
 
     processed_png = assets_icons_dir / f"{icon_key}.png"
@@ -3808,7 +3810,7 @@ class HelpPage(QWidget):
         cat_row.setSpacing(6)
         self.category_buttons: dict[str, QPushButton] = {}
         for cat in ("All", "Instances", "Game Files", "Mods & Shaders", "Account", "Troubleshooting"):
-            c_btn = QPushButton(cat)
+            c_btn = QPushButton(cat.replace("&", "&&"))
             c_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
             c_btn.setFixedHeight(24)
             c_btn.setFont(QFont(lato_family, 8, QFont.Weight.Bold))

@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)build, e.g. v1.0.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Build single-file executable
+        run: pyinstaller lightyear.spec --noconfirm
+
+      - name: Build portable folder
+        env:
+          LIGHTYEAR_ONEDIR: "1"
+        run: pyinstaller lightyear.spec --noconfirm
+
+      - name: Package artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release | Out-Null
+          $exe = "release/Lightyear-$env:TAG-windows-x64.exe"
+          $zip = "release/Lightyear-$env:TAG-windows-x64-portable.zip"
+          Copy-Item dist/Lightyear.exe $exe
+          Compress-Archive -Path dist/Lightyear/* -DestinationPath $zip
+          Get-ChildItem release/* -File | ForEach-Object {
+            $h = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$h  $($_.Name)"
+          } | Set-Content release/SHA256SUMS.txt -Encoding ascii
+          Get-Content release/SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: Lightyear ${{ env.TAG }}
+          generate_release_notes: true
+          prerelease: ${{ contains(env.TAG, '-') }}
+          files: release/*
+          body: |
+            ## 📥 Download
+
+            | File | Description |
+            | --- | --- |
+            | `Lightyear-${{ env.TAG }}-windows-x64.exe` | Single executable. Download and run. |
+            | `Lightyear-${{ env.TAG }}-windows-x64-portable.zip` | Portable folder. Faster startup; extract and run `Lightyear.exe`. |
+            | `SHA256SUMS.txt` | Checksums to verify your download. |
+
+            > Windows SmartScreen may warn because the binary is not code-signed yet. Click **More info → Run anyway**.
+            > This build was produced automatically by GitHub Actions from the tagged source code.
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.

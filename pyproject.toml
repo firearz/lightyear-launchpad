@@ -1,0 +1,37 @@
+[project]
+name = "lightyear-launcher"
+dynamic = ["version"]
+description = "A beautiful, open-source Minecraft launcher with a frosted-glass UI — built with Python & PySide6."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "firearz" }]
+requires-python = ">=3.10"
+keywords = ["minecraft", "launcher", "pyside6", "qt", "fabric", "forge", "quilt"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Win32 (MS Windows)",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3",
+  "Topic :: Games/Entertainment",
+]
+dependencies = [
+  "PySide6>=6.7",
+  "minecraft-launcher-lib>=8.0",
+  "Pillow>=10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/firearz/lightyear-launchpad"
+Issues = "https://github.com/firearz/lightyear-launchpad/issues"
+Releases = "https://github.com/firearz/lightyear-launchpad/releases"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["old_launcher"]
+
+[tool.ruff.lint]
+# Start strict-on-bugs, lenient-on-style. Tighten over time.
+select = ["E9", "F63", "F7", "F82", "F401"]
