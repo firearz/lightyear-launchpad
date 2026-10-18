@@ -1,0 +1,19 @@
+[14:21:14] [main/INFO]: Loading Minecraft 26.3 with Fabric Loader 0.20.0
+[14:21:14] [main/INFO]: Mappings not present!
+[14:21:14] [main/ERROR]: Uncaught exception in thread "main"
+java.lang.RuntimeException: Could not create directory C:\Users\NILESH\AppData\Roaming\LightYieldLauncher\instances\test\mods
+	at net.fabricmc.loader.impl.discovery.DirectoryModCandidateFinder.findCandidates(DirectoryModCandidateFinder.java:48)
+	at net.fabricmc.loader.impl.discovery.ModDiscoverer.discoverMods(ModDiscoverer.java:111)
+	at net.fabricmc.loader.impl.FabricLoaderImpl.setup(FabricLoaderImpl.java:227)
+	at net.fabricmc.loader.impl.FabricLoaderImpl.load(FabricLoaderImpl.java:204)
+	at net.fabricmc.loader.impl.launch.knot.Knot.init(Knot.java:142)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:66)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+Caused by: java.nio.file.NoSuchFileException: C:\Users\NILESH\AppData\Roaming\LightYieldLauncher\instances\test\mods
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:85)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:104)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:109)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.createDirectory(WindowsFileSystemProvider.java:631)
+	at java.base/java.nio.file.Files.createDirectory(Files.java:649)
+	at net.fabricmc.loader.impl.discovery.DirectoryModCandidateFinder.findCandidates(DirectoryModCandidateFinder.java:45)
+	... 6 more

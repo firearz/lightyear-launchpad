@@ -1,0 +1,21 @@
+[package]
+name = "kestryx-loaders"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kestryx-meta = { path = "../kestryx-meta" }
+kestryx-net = { path = "../kestryx-net" }
+kestryx-store = { path = "../kestryx-store" }
+anyhow.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+kestryx-instances = { path = "../kestryx-instances" }
+tempfile.workspace = true

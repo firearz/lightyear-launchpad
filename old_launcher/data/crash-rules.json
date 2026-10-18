@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "id": "oom-heap-space",
+      "title": "Out of Memory (Java Heap Space Exhausted)",
+      "severity": "critical",
+      "category": "memory",
+      "patterns": [
+        "java\\.lang\\.OutOfMemoryError: Java heap space",
+        "java\\.lang\\.OutOfMemoryError: GC overhead limit exceeded",
+        "There is insufficient memory for the Java Runtime Environment to continue"
+      ],
+      "cause_explanation": "Minecraft ran out of allocated RAM (-Xmx) while loading textures, chunks, or mods.",
+      "fix": {
+        "action_kind": "increase_ram",
+        "label": "Increase RAM Allocation (+2048 MB)",
+        "recommended_delta_mb": 2048
+      }
+    },
+    {
+      "id": "wrong-java-class-version",
+      "title": "Incompatible Java Version (UnsupportedClassVersionError)",
+      "severity": "critical",
+      "category": "java",
+      "patterns": [
+        "java\\.lang\\.UnsupportedClassVersionError: .* has been compiled by a more recent version of the Java Runtime \\(class file version (?P<class_ver>\\d+)\\.\\d+\\)"
+      ],
+      "cause_explanation": "A mod or the game itself requires a newer Java version than the one currently selected for this instance.",
+      "fix": {
+        "action_kind": "switch_java_for_class_version",
+        "label": "Switch to Required Java Runtime Automatically"
+      }
+    },
+    {
+      "id": "legacy-forge-java8-required",
+      "title": "Legacy Forge Requires Java 8",
+      "severity": "critical",
+      "category": "java",
+      "patterns": [
+        "java\\.lang\\.ClassCastException: class jdk\\.internal\\.loader\\.ClassLoaders\\$AppClassLoader cannot be cast to class java\\.net\\.URLClassLoader",
+        "LaunchWrapper.*ClassCastException.*URLClassLoader"
+      ],
+      "cause_explanation": "Minecraft 1.12.2 and older Forge/LaunchWrapper versions rely on Java 8 internals removed in Java 9+.",
+      "fix": {
+        "action_kind": "switch_java_major",
+        "target_major": 8,
+        "label": "Switch Instance to Managed Java 8"
+      }
+    },
+    {
+      "id": "missing-mod-dependency",
+      "title": "Missing Required Mod Dependency",
+      "severity": "error",
+      "category": "mods",
+      "patterns": [
+        "Mod '(?P<mod_name>[^']+)' \\((?P<mod_id>[^)]+)\\) .* requires .* '(?P<dep_id>[a-z0-9_\\-]+)'",
+        "Missing or unsupported mandatory dependencies:\\s*Mod ID: '(?P<dep_id>[a-z0-9_\\-]+)', Requested by: '(?P<mod_id>[a-z0-9_\\-]+)'",
+        "Unmet dependency listing:.*requires (?P<dep_id>[a-z0-9_\\-]+)"
+      ],
+      "cause_explanation": "An installed mod requires another library or API mod (such as Fabric API or Cloth Config) that is not installed.",
+      "fix": {
+        "action_kind": "install_missing_dependency",
+        "label": "Install Missing Dependency from Modrinth"
+      }
+    },
+    {
+      "id": "duplicate-mods-detected",
+      "title": "Duplicate Mod Jars Detected",
+      "severity": "error",
+      "category": "mods",
+      "patterns": [
+        "Found duplicate mods:\\s*(?P<mod_id>[a-z0-9_\\-]+)",
+        "ModResolutionException: Duplicate mods found",
+        "DuplicateModsFoundException"
+      ],
+      "cause_explanation": "Two different jar files in your mods/ folder provide the same mod ID.",
+      "fix": {
+        "action_kind": "disable_older_duplicate_mod",
+        "label": "Disable Older Duplicate Jar"
+      }
+    },
+    {
+      "id": "mixin-injection-failure",
+      "title": "Mod Mixin Conflict or Bytecode Injection Error",
+      "severity": "error",
+      "category": "mods",
+      "patterns": [
+        "org\\.spongepowered\\.asm\\.mixin\\.transformer\\.throwables\\.MixinTransformerError",
+        "Mixin apply for mod (?P<mod_id>[a-z0-9_\\-]+) failed",
+        "Critical injection failure: .* in (?P<mixin_json>[^\\s:]+\\.mixins\\.json)"
+      ],
+      "cause_explanation": "A mod failed to patch the game's code, usually because it was built for a different Minecraft version or conflicts with another optimization mod.",
+      "fix": {
+        "action_kind": "isolate_culprit_mod",
+        "label": "Disable Conflicting Mod & Retry"
+      }
+    },
+    {
+      "id": "gpu-driver-access-violation",
+      "title": "Graphics Driver Crash (Native OpenGL/Vulkan Error)",
+      "severity": "critical",
+      "category": "hardware",
+      "patterns": [
+        "EXCEPTION_ACCESS_VIOLATION.*\\[(?P<dll>atio6axx\\.dll|nvoglv64\\.dll|ig75icd64\\.dll|igxelpicd64\\.dll)",
+        "GLFW error 65542: WGL: The driver does not appear to support OpenGL",
+        "GLFW error 65543: GLX: Failed to create context"
+      ],
+      "cause_explanation": "Your GPU graphics driver crashed or failed to initialize an OpenGL context.",
+      "fix": {
+        "action_kind": "enable_discrete_gpu_and_safe_render",
+        "label": "Force Discrete GPU & Safe OpenGL Flags"
+      }
+    }
+  ]
+}

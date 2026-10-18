@@ -1,0 +1,71 @@
+{
+  "benchmark": "Kestryx M0 Architecture Spike",
+  "timestamp": "2026-10-16T14:22:22.295Z",
+  "nodeVersion": "v24.17.0",
+  "platform": "win32-x64",
+  "parameters": {
+    "iterations": 40,
+    "warmupIterations": 8,
+    "instanceCount": 1000,
+    "modCount": 2000
+  },
+  "workloads": {
+    "instanceHydrationAndFilter1000": {
+      "svelte5FineGrainedVirtualized": {
+        "iterations": 40,
+        "minMs": 0.047,
+        "p50Ms": 0.107,
+        "p95Ms": 0.275,
+        "maxMs": 0.279,
+        "meanMs": 0.125
+      },
+      "vdomUnvirtualizedBaseline": {
+        "iterations": 40,
+        "minMs": 0.136,
+        "p50Ms": 0.326,
+        "p95Ms": 1.103,
+        "maxMs": 1.166,
+        "meanMs": 0.42
+      },
+      "speedupFactorP50": 3.05
+    },
+    "modFilterAndDiff2000": {
+      "svelte5FineGrainedVirtualized": {
+        "iterations": 40,
+        "minMs": 0.072,
+        "p50Ms": 0.258,
+        "p95Ms": 0.601,
+        "maxMs": 0.715,
+        "meanMs": 0.261
+      },
+      "vdomUnvirtualizedBaseline": {
+        "iterations": 40,
+        "minMs": 0.298,
+        "p50Ms": 0.753,
+        "p95Ms": 2.455,
+        "maxMs": 4.63,
+        "meanMs": 1.047
+      },
+      "speedupFactorP50": 2.92
+    }
+  },
+  "footprintComparison": {
+    "tauri2WebView2PlusSvelte5": {
+      "runtimeFrameworkGzipKb": 16.4,
+      "initialAppBundleBudgetGzipKb": 150,
+      "idleRendererHeapEstimateMb": 28.5,
+      "installerFootprintEstimateMb": 8.4
+    },
+    "electronPlusReactVdomBaseline": {
+      "runtimeFrameworkGzipKb": 44.8,
+      "initialAppBundleBudgetGzipKb": 310,
+      "idleRendererHeapEstimateMb": 145,
+      "installerFootprintEstimateMb": 92
+    }
+  },
+  "decision": {
+    "selectedShell": "Tauri 2 + Rust Core Workspace",
+    "selectedFrontend": "Svelte 5 (Runes fine-grained reactivity) + TypeScript + Vite + Zero Runtime CSS-in-JS",
+    "meetsSub16msSearchTarget": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "description": "Fast, capable, open-source Minecraft: Java Edition launcher and CLI",
+  "homepage": "https://github.com/kestryx/kestryx",
+  "license": "GPL-3.0-or-later",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/kestryx/kestryx/releases/download/v0.1.0/kestryx-portable-windows-x64.zip",
+      "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  "bin": "kestryx.exe",
+  "persist": "kestryx-data"
+}

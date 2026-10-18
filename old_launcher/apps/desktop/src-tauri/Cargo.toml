@@ -1,0 +1,24 @@
+[package]
+name = "kestryx-app"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Kestryx Tauri 2 Desktop Host"
+
+[dependencies]
+kestryx-auth = { path = "../../../crates/kestryx-auth" }
+kestryx-diagnostics = { path = "../../../crates/kestryx-diagnostics" }
+kestryx-import = { path = "../../../crates/kestryx-import" }
+kestryx-instances = { path = "../../../crates/kestryx-instances" }
+kestryx-java = { path = "../../../crates/kestryx-java" }
+kestryx-launch = { path = "../../../crates/kestryx-launch" }
+kestryx-loaders = { path = "../../../crates/kestryx-loaders" }
+kestryx-meta = { path = "../../../crates/kestryx-meta" }
+kestryx-mods = { path = "../../../crates/kestryx-mods" }
+kestryx-net = { path = "../../../crates/kestryx-net" }
+kestryx-skins = { path = "../../../crates/kestryx-skins" }
+kestryx-store = { path = "../../../crates/kestryx-store" }
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.40", features = ["full"] }

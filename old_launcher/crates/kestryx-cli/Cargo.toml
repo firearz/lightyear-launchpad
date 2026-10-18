@@ -1,0 +1,31 @@
+[package]
+name = "kestryx-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "kestryx"
+path = "src/main.rs"
+
+[dependencies]
+kestryx-auth = { path = "../kestryx-auth" }
+kestryx-diagnostics = { path = "../kestryx-diagnostics" }
+kestryx-import = { path = "../kestryx-import" }
+kestryx-instances = { path = "../kestryx-instances" }
+kestryx-java = { path = "../kestryx-java" }
+kestryx-launch = { path = "../kestryx-launch" }
+kestryx-loaders = { path = "../kestryx-loaders" }
+kestryx-meta = { path = "../kestryx-meta" }
+kestryx-mods = { path = "../kestryx-mods" }
+kestryx-net = { path = "../kestryx-net" }
+kestryx-skins = { path = "../kestryx-skins" }
+kestryx-store = { path = "../kestryx-store" }
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tempfile.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
