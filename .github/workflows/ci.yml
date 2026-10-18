@@ -55,7 +55,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: pyinstaller lightyear.spec --noconfirm
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Lightyear-${{ github.sha }}-windows-x64
           path: dist/Lightyear.exe
