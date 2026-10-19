@@ -17,6 +17,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QFileDialog,
+    QLabel,
     QMainWindow,
     QMessageBox,
     QStackedWidget,
@@ -51,6 +52,11 @@ from .ui_components import (
     ensure_circular_logo_ico,
     make_circular_logo_icon,
 )
+
+# Background photo credit — the sky photo was clicked by Shubham.
+# TODO: replace with Shubham's exact Instagram handle.
+PHOTO_CREDIT_NAME = "Shubham, India"
+PHOTO_CREDIT_URL = "https://www.instagram.com/shubham.pvt.exe/"
 
 
 class ManifestSyncWorker(QThread):
@@ -198,9 +204,33 @@ class LightyearMainWindow(QMainWindow):
         self.progress_dock.hide()
         self.main_layout.addWidget(self.progress_dock)
 
+        # 5. Background photo credit (floats in the bottom-right margin)
+        self.photo_credit = QLabel(self.central)
+        self.photo_credit.setTextFormat(Qt.TextFormat.RichText)
+        self.photo_credit.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        self.photo_credit.setOpenExternalLinks(True)
+        self.photo_credit.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.photo_credit.setToolTip("View Shubham's photography on Instagram")
+        self.photo_credit.setStyleSheet("background: transparent; border: none;")
+        self.photo_credit.setText(
+            f'<a href="{PHOTO_CREDIT_URL}" style="color: rgba(255,255,255,0.55); '
+            f'text-decoration: none; font-family: \'{self.lato_family}\'; font-size: 10px;">'
+            f"📷 Clicked by {PHOTO_CREDIT_NAME}</a>"
+        )
+        self.photo_credit.adjustSize()
+        self._position_photo_credit()
+
         self.backdrop.ensure_scaled(self.size())
         self._sync_ui()
         self._start_manifest_sync()
+
+    def _position_photo_credit(self) -> None:
+        lbl = self.photo_credit
+        lbl.adjustSize()
+        x = self.central.width() - lbl.width() - 24
+        y = self.central.height() - lbl.height() - 2
+        lbl.move(max(0, x), max(0, y))
+        lbl.raise_()
 
     # -----------------------------------------------------------------------
     # Enforce Windowed Mode Only & Paint Backdrop
@@ -234,6 +264,7 @@ class LightyearMainWindow(QMainWindow):
     def showEvent(self, event) -> None:
         super().showEvent(event)
         self._apply_windows_taskbar_icon()
+        QTimer.singleShot(0, self._position_photo_credit)
 
     def changeEvent(self, event: QEvent) -> None:
         if event.type() == QEvent.Type.WindowStateChange:
@@ -245,6 +276,8 @@ class LightyearMainWindow(QMainWindow):
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self.backdrop.ensure_scaled(self.size())
+        if hasattr(self, "photo_credit"):
+            self._position_photo_credit()
 
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
@@ -504,41 +537,47 @@ class LightyearMainWindow(QMainWindow):
             self.open_new_installation_popup()
             return
 
-        # Pre-launch Java Compatibility Verification & Guidance
-        compat, req_major, det_major, auto_path = check_java_compatibility(
-            inst.mc_version,
-            self.store.root,
-            custom_path=inst.java_path,
-        )
-        if not compat:
-            dlg = JavaMissingOrIncompatibleDialog(
-                mc_version=inst.mc_version,
-                req_major=req_major,
-                det_major=det_major,
-                current_path=auto_path,
-                lato_family=self.lato_family,
-                parent=self,
+        try:
+            # Pre-launch Java Compatibility Verification & Guidance
+            compat, req_major, det_major, auto_path = check_java_compatibility(
+                inst.mc_version,
+                self.store.root,
+                custom_java=inst.java_path,
             )
-            if dlg.exec() == JavaMissingOrIncompatibleDialog.DialogCode.Accepted and dlg.selected_java_path:
-                self.store.update_instance_settings(instance_id=inst.id, java_path=dlg.selected_java_path)
-                inst = self.store.get_instance(instance_id)
-                if not inst:
+            if not compat:
+                dlg = JavaMissingOrIncompatibleDialog(
+                    mc_version=inst.mc_version,
+                    req_major=req_major,
+                    det_major=det_major,
+                    current_path=auto_path,
+                    lato_family=self.lato_family,
+                    parent=self,
+                )
+                if dlg.exec() == JavaMissingOrIncompatibleDialog.DialogCode.Accepted and dlg.selected_java_path:
+                    self.store.update_instance_settings(instance_id=inst.id, java_path=dlg.selected_java_path)
+                    inst = self.store.get_instance(instance_id)
+                    if not inst:
+                        return
+                else:
                     return
-            else:
-                return
 
-        self.hero_section.select_instance(inst.id)
-        self.hero_section.set_busy(True, "Launching...")
-        self.progress_dock.show()
-        self.progress_dock.set_step(4, "Launching", f"{inst.mc_version} {inst.loader}")
-        self.progress_dock.set_progress(25, "Preparing runtime...")
+            self.hero_section.select_instance(inst.id)
+            self.hero_section.set_busy(True, "Launching...")
+            self.progress_dock.show()
+            self.progress_dock.set_step(4, "Launching", f"{inst.mc_version} {inst.loader}")
+            self.progress_dock.set_progress(25, "Preparing runtime...")
 
-        self._launch_worker = GameLaunchWorker(self.store, inst, self)
-        self._launch_worker.status_updated.connect(self.progress_dock.set_progress)
-        self._launch_worker.game_started.connect(self._on_game_started)
-        self._launch_worker.game_finished.connect(self._on_game_finished)
-        self._launch_worker.launch_failed.connect(self._on_launch_failed)
-        self._launch_worker.start()
+            self._launch_worker = GameLaunchWorker(self.store, inst, self)
+            self._launch_worker.status_updated.connect(self.progress_dock.set_progress)
+            self._launch_worker.game_started.connect(self._on_game_started)
+            self._launch_worker.game_finished.connect(self._on_game_finished)
+            self._launch_worker.launch_failed.connect(self._on_launch_failed)
+            self._launch_worker.start()
+        except Exception as exc:
+            self.hero_section.set_busy(False)
+            self.progress_dock.hide()
+            self._sync_ui()
+            QMessageBox.critical(self, "Launch Error", f"Failed to prepare launch for {inst.name}:\n{exc}")
 
     def _on_game_started(self, pid: int, instance_name: str) -> None:
         self.progress_dock.set_progress(100, "Running")

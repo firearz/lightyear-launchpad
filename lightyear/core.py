@@ -143,7 +143,10 @@ class InstanceConfig:
         else:
             p = get_launcher_root() / "instances" / self.id
         p.mkdir(parents=True, exist_ok=True)
+        for sub in ("mods", "resourcepacks", "saves"):
+            (p / sub).mkdir(parents=True, exist_ok=True)
         return p
+
 
 
 @dataclass
@@ -1067,14 +1070,19 @@ def check_java_compatibility(
     mc_version: str,
     root: Path,
     custom_java: str | None = None,
+    custom_path: str | None = None,
 ) -> tuple[bool, int, int | None, str]:
     """
     Returns (is_compatible, required_major, detected_major, java_executable_path).
     Detects whether the configured custom Java or auto-detected Java meets Minecraft's requirement.
     """
+    if custom_path and not custom_java:
+        custom_java = custom_path
+
     req_major = get_required_java_major(mc_version, root)
     if custom_java and custom_java.strip():
         p = Path(custom_java.strip())
+
         if p.exists():
             maj = inspect_java_major(p)
             if maj is not None:

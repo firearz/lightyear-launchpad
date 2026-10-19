@@ -1637,7 +1637,7 @@ class InstanceCard(FrostedGlassPanel):
             }
             """
         )
-        folder_btn.clicked.connect(lambda: self.open_folder_clicked.emit(self.instance.id))
+        folder_btn.clicked.connect(lambda checked=False, iid=self.instance.id: self.open_folder_clicked.emit(iid))
         layout.addWidget(folder_btn)
 
         # 4. Play Button
@@ -1662,7 +1662,7 @@ class InstanceCard(FrostedGlassPanel):
             }
             """
         )
-        play_btn.clicked.connect(lambda: self.play_clicked.emit(self.instance.id))
+        play_btn.clicked.connect(lambda checked=False, iid=self.instance.id: self.play_clicked.emit(iid))
         layout.addWidget(play_btn)
 
     def enterEvent(self, event) -> None:
